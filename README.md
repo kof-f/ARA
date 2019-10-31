@@ -30,32 +30,35 @@ with the everyday struggles they face in the confines of their home.
     its obstacles.
  
  ## Controls
+ 
  ### Keyboard Controls
-    * w: moves ARA forward 12 inches at a time
-    * s: moves ARA backward 12 inches at a time
-    * a: turns ARA left 90 degrees and moves her forward 6 inches
-    * d: turns ARA right 90 degrees and moves her forward 6 inches
-    * q: open ARA's claw
-    * e: close ARA's claw
-    * z: rotate ARA's claw to a vertical position
-    * x: rotate ARA's claw to a horizontal position
-    * i: move arm mid to highest position
-    * k: move arm mid to middle position
-    * ,: move arm mid to lowest position
-    * u: move arm base to highest position
-    * j: move arm base to middle position
-    * m: move arm base to lowest position
-    * l: pan camera left
-    * ;: pan camera mid
-    * ': pan camera right
-    * o: tilt camera down
-    * p: tilt camera mid
-    * [: tilt camera up
-    * spacebar: starts ARA's camera stream
-    * esc: sends text message to user
-    * c: prints these controls
+ 
+* w: moves ARA forward 12 inches at a time
+* s: moves ARA backward 12 inches at a time
+* a: turns ARA left 90 degrees and moves her forward 6 inches
+* d: turns ARA right 90 degrees and moves her forward 6 inches
+* q: open ARA's claw
+* e: close ARA's claw
+* z: rotate ARA's claw to a vertical position
+* x: rotate ARA's claw to a horizontal position
+* i: move arm mid to highest position
+* k: move arm mid to middle position
+* ,: move arm mid to lowest position
+* u: move arm base to highest position
+* j: move arm base to middle position
+* m: move arm base to lowest position
+* l: pan camera left
+* ;: pan camera mid
+* ': pan camera right
+* o: tilt camera down
+* p: tilt camera mid
+* [: tilt camera up
+* spacebar: starts ARA's camera stream
+* esc: sends text message to user
+* c: prints these controls
    
    ### DualShock 4 Controller: 
+   
     * R2: moves ARA forward 12 inches at a time
     * L2: moves ARA backward 12 inches at a time
     * L1: turns ARA left 90 degrees and moves her forward 6 inches
