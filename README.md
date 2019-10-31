@@ -59,26 +59,26 @@ with the everyday struggles they face in the confines of their home.
    
    ### DualShock 4 Controller: 
    
-* R2: moves ARA forward 12 inches at a time
-* L2: moves ARA backward 12 inches at a time
-* L1: turns ARA left 90 degrees and moves her forward 6 inches
-* R1: turns ARA right 90 degrees and moves her forward 6 inches
-* circle: open ARA's claw
-* cross: close ARA's claw
-* square: rotate ARA's claw to a vertical position
-* triangle: rotate ARA's claw to a horizontal position
-* LS Up: move arm mid to highest position
-* L3: move arm mid to middle position
-* LS Down: move arm mid to lowest position
-* RS Up: move arm base to highest position
-* R3: move arm base to middle position
-* RS Down: move arm base to lowest position
-* Tilt Left: pan camera left
-* Tilt Up: pan camera mid
-* Tilt Right: pan camera right
-* Down: tilt camera down
-* Tilt Down: tilt camera mid
-* Up: tilt camera up
-* PS Button: starts ARA's camera stream
-* Share button: sends text message to user
-* options: prints these controls
+* **R2:** moves ARA forward 12 inches at a time
+* **L2:** moves ARA backward 12 inches at a time
+* **L1:** turns ARA left 90 degrees and moves her forward 6 inches
+* **R1:** turns ARA right 90 degrees and moves her forward 6 inches
+* **circle:** open ARA's claw
+* **cross:** close ARA's claw
+* **square:** rotate ARA's claw to a vertical position
+* **triangle:** rotate ARA's claw to a horizontal position
+* **LS Up:** move arm mid to highest position
+* **L3:** move arm mid to middle position
+* **LS Down:** move arm mid to lowest position
+* **RS Up:** move arm base to highest position
+* **R3:** move arm base to middle position
+* **RS Down:** move arm base to lowest position
+* **Tilt Left:** pan camera left
+* **Tilt Up:** pan camera mid
+* **Tilt Right:** pan camera right
+* **Tilt Down:** tilt camera mid
+* **Down:** tilt camera down
+* **Up:** tilt camera up
+* **PS Button:** starts ARA's camera stream
+* **Share button:** sends text message to user
+* **options:** prints these controls
