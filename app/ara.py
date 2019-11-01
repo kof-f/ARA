@@ -10,17 +10,22 @@ class ARA:
     def __init__(self):
         # used to open the socket and send commands (packets) to ARA (Raspberry Pi 3) through its Wi-Fi
         # double check these are correct by using Wireshark to packet sniff when connected to ARA's Wi-Fi
-        __IP = "192.168.1.1"
-        __port = 2001
+        self.ip = "192.168.1.1"
+        self.port = 2001
+        self.stop = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
+        self.forward = bytearray([0xFF, 0x00, 0x04, 0x00, 0xFF])
+        self.backward = bytearray([0xFF, 0x00, 0x03, 0x00, 0xFF])
+        self.left = bytearray([0xFF, 0x00, 0x01, 0x00, 0xFF])
+        self.right = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
 
     def getIP(self):
-        return self.__IP
+        return self.ip
 
-    def setIP(self, IP):
-        self.__IP = IP
+    def setIP(self, ip):
+        self.ip = ip
 
     def getPort(self):
-        return self.__port
+        return self.port
 
     def sendCommand(self, command):
         '''
@@ -31,8 +36,25 @@ class ARA:
         Sends a command to ARA through Wi-Fi. The command must be a byte array.
         '''
         ara = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ara.connect((self.__IP, self.__port))
+        ara.connect((self.getIP(), self.getPort()))
         ara.send(command)
+
+    def moveForward(self):
+        print("Sending forward command.")
+        self.sendCommand(self.forward)
+
+    def moveBackward(self):
+        print("Sending backward command.")
+        self.sendCommand(self.backward)
+
+    def moveForward(self):
+        print("Sending forward command.")
+        self.sendCommand(self.forward)
+
+    def stopMovement(self):
+        print("Stopping.")
+        self.sendCommand(self.stop)
+
 
 # variables used to open socket and send commands
 # MAKE SURE TO CHANGE THE IP ADDRESS TO THE IP OF THE RASPBERRY PI ON ARA
@@ -1026,6 +1048,8 @@ def constControl():
     print("Initializing ARA...")
     controls()
 
+    araObj = ARA()
+
     # -------- Main Loop -----------
     while not done:
         keys = pygame.key.get_pressed()  # checking pressed keys
@@ -1033,7 +1057,7 @@ def constControl():
             print("Exiting the program.")
             done = True
         elif keys[pygame.K_w]:
-            constForward()
+            araObj.moveForward()
         elif keys[pygame.K_s]:
             constBackward()
         elif keys[pygame.K_a]:
@@ -1041,7 +1065,7 @@ def constControl():
         elif keys[pygame.K_d]:
             constTurnRight()
         else:
-            stopMovement()
+            araObj.stopMovement()
 
         for e in pygame.event.get():
             pass  # proceed other events.
