@@ -39,21 +39,60 @@ class ARA:
         ara.connect((self.getIP(), self.getPort()))
         ara.send(command)
 
+    def stopMovement(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends stop command to ARA using stop attribute defined in its constructor.
+        '''
+        print("Stopping.")
+        self.sendCommand(self.stop)
+
     def moveForward(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends move forward command to ARA using forward attribute defined in its constructor.
+        '''
         print("Sending forward command.")
         self.sendCommand(self.forward)
 
     def moveBackward(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends move backward command to ARA using backward attribute defined in its constructor.
+        '''
         print("Sending backward command.")
         self.sendCommand(self.backward)
 
-    def moveForward(self):
-        print("Sending forward command.")
-        self.sendCommand(self.forward)
+    def turnLeft(self):
+        '''
 
-    def stopMovement(self):
-        print("Stopping.")
-        self.sendCommand(self.stop)
+        :param: N/A
+        :return: N/A
+
+        Sends turn left command to ARA using left attribute defined in constructor.
+        '''
+        print("Sending turn left command.")
+        self.sendCommand(self.left)
+
+    def turnRight(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends turn right command to ARA using right attribute defined in constructor.
+        '''
+        print("Sending turn right command.")
+        self.sendCommand(self.right)
 
 
 # variables used to open socket and send commands
@@ -994,7 +1033,7 @@ def constControl():
     :param: N/A
     :return: N/A
 
-    Constant control of ARA.
+    Initializes and controls ARA based on keyboard input.
     '''
 
     # Define some colors
@@ -1059,16 +1098,19 @@ def constControl():
         elif keys[pygame.K_w]:
             araObj.moveForward()
         elif keys[pygame.K_s]:
-            constBackward()
+            araObj.moveBackward()
         elif keys[pygame.K_a]:
-            constTurnLeft()
+            araObj.turnLeft()
         elif keys[pygame.K_d]:
-            constTurnRight()
+            araObj.turnRight()
         else:
             araObj.stopMovement()
 
-        for e in pygame.event.get():
-            pass  # proceed other events.
+        for event in pygame.event.get():  # User did something
+            if event.type == pygame.QUIT:
+                # If user clicked close
+                print("Exiting the program.")
+                done = True  # Flag that we are done so we exit this loop
             # always call event.get() or event.poll() in the main loop
 
         # Set the screen background
