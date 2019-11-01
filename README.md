@@ -42,7 +42,10 @@ to discover more about why ARA was developed.
 ### Python Modules
 * Install pygame which is used by the script to map keyboard input to an ARA command. Try the following code in your
 terminal:
-`pip3 install --trusted-host files.pythonhosted.org --trusted-host pypi.org --trusted-host pypi.python.org pygame`
+`pip3 install --trusted-host files.pythonhosted.org --trusted-host pypi.org --trusted-host pypi.python.org pygame`. This
+command should work on both Windows and Mac.
+    - If you're having problems installing pygame on Mac, try following this
+     [guide](https://nostarch.com/download/Teach_Your_Kids_to_Code_InstallingPygame_MacLinux.pdf).
  
  ## Controls
  ### Keyboard Controls
