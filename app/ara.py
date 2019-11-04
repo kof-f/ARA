@@ -27,6 +27,9 @@ class ARA:
     def getPort(self):
         return self.port
 
+    def setPort(self, port):
+        self.port = port
+
     def sendCommand(self, command):
         '''
 
