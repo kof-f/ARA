@@ -19,6 +19,8 @@ class ARA:
         self.right = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
         self.clawOpen = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
         self.clawClose = bytearray([0xFF, 0x01, 0x04, 0xab, 0xFF])
+        self.clawHorizontal = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
+        self.clawVertical = bytearray([0xFF, 0x01, 0x03, 0xab, 0xFF])
 
     def getIP(self):
         return self.ip
@@ -122,6 +124,23 @@ class ARA:
             print("Sending claw close command.")
             self.sendCommand(self.clawClose)
 
+    def clawRotate(self, pos):
+        '''
+
+        :param pos: enter 0 to rotate the claw to its vertical position or
+        1 to rotate it to its horizontal position
+        :return: N/A
+
+        Sends claw rotate command to ARA using the claw horizontal and vertical attributes
+        defined in the constructor.
+        '''
+
+        if pos == 1:
+            print("Sending claw rotate horizontal command.")
+            self.sendCommand(self.clawHorizontal)
+        else:
+            print("Sending claw rotate vertical command.")
+            self.sendCommand(self.clawVertical)
 
 
 # variables used to open socket and send commands
@@ -1114,37 +1133,50 @@ def constControl():
     clock = pygame.time.Clock()
 
     print("Initializing ARA...")
-    controls()
-
     araObj = ARA()
-
+    controls()
+    
     # -------- Main Loop -----------
     while not done:
-        keys = pygame.key.get_pressed()  # checking pressed keys
+        # checking pressed keys
+        keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
             print("Exiting the program.")
             done = True
+        # while w is pressed, move ARA forward
         elif keys[pygame.K_w]:
             araObj.moveForward()
+        # while s is pressed, move ARA backward
         elif keys[pygame.K_s]:
             araObj.moveBackward()
+        # while a is pressed, turn ARA left
         elif keys[pygame.K_a]:
             araObj.turnLeft()
+        # while d is pressed, turn ARA right
         elif keys[pygame.K_d]:
             araObj.turnRight()
+        # while q is pressed, open ARA's claw
         elif keys[pygame.K_q]:
             araObj.clawControl(1)
+        # while e is pressed, close ARA's claw
         elif keys[pygame.K_e]:
             araObj.clawControl(0)
+        # while z is pressed, rotate ARA's claw vertically
+        elif keys[pygame.K_z]:
+            araObj.clawRotate(0)
+        # while x is pressed, rotate ARA's claw horizontally
+        elif keys[pygame.K_x]:
+            araObj.clawRotate(1)
+        # if no keys are being pressed, stop ARA from moving
         else:
             araObj.stopMovement()
 
-        for event in pygame.event.get():  # User did something
+        # check if the user did something other than holding a key down
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # If user clicked close
                 print("Exiting the program.")
-                done = True  # Flag that we are done so we exit this loop
-            # always call event.get() or event.poll() in the main loop
+                done = True
 
         # Set the screen background
         screen.fill(BLACK)
