@@ -17,6 +17,8 @@ class ARA:
         self.backward = bytearray([0xFF, 0x00, 0x03, 0x00, 0xFF])
         self.left = bytearray([0xFF, 0x00, 0x01, 0x00, 0xFF])
         self.right = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
+        self.clawOpen = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
+        self.clawClose = bytearray([0xFF, 0x01, 0x04, 0xab, 0xFF])
 
     def getIP(self):
         return self.ip
@@ -38,6 +40,7 @@ class ARA:
 
         Sends a command to ARA through Wi-Fi. The command must be a byte array.
         '''
+
         ara = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ara.connect((self.getIP(), self.getPort()))
         ara.send(command)
@@ -48,9 +51,10 @@ class ARA:
         :param: N/A
         :return: N/A
 
-        Sends stop command to ARA using stop attribute defined in its constructor.
+        Sends stop command to ARA using stop attribute defined in the constructor.
         '''
-        print("Stopping.")
+
+        print("Sending stop command.")
         self.sendCommand(self.stop)
 
     def moveForward(self):
@@ -59,8 +63,9 @@ class ARA:
         :param: N/A
         :return: N/A
 
-        Sends move forward command to ARA using forward attribute defined in its constructor.
+        Sends move forward command to ARA using forward attribute defined in the constructor.
         '''
+
         print("Sending forward command.")
         self.sendCommand(self.forward)
 
@@ -70,8 +75,9 @@ class ARA:
         :param: N/A
         :return: N/A
 
-        Sends move backward command to ARA using backward attribute defined in its constructor.
+        Sends move backward command to ARA using backward attribute defined in the constructor.
         '''
+
         print("Sending backward command.")
         self.sendCommand(self.backward)
 
@@ -81,8 +87,9 @@ class ARA:
         :param: N/A
         :return: N/A
 
-        Sends turn left command to ARA using left attribute defined in constructor.
+        Sends turn left command to ARA using left attribute defined in the constructor.
         '''
+
         print("Sending turn left command.")
         self.sendCommand(self.left)
 
@@ -92,10 +99,29 @@ class ARA:
         :param: N/A
         :return: N/A
 
-        Sends turn right command to ARA using right attribute defined in constructor.
+        Sends turn right command to ARA using right attribute defined in the constructor.
         '''
+
         print("Sending turn right command.")
         self.sendCommand(self.right)
+
+    def clawControl(self, pos):
+        '''
+
+        :param pos: enter 0 to close claw or 1 to open claw
+        :return: N/A
+
+        Sends claw open or close command to ARA using the claw open and close attributes
+        defined in the constructor.
+        '''
+
+        if pos == 1:
+            print("Sending claw open command.")
+            self.sendCommand(self.clawOpen)
+        else:
+            print("Sending claw close command.")
+            self.sendCommand(self.clawClose)
+
 
 
 # variables used to open socket and send commands
@@ -1106,6 +1132,10 @@ def constControl():
             araObj.turnLeft()
         elif keys[pygame.K_d]:
             araObj.turnRight()
+        elif keys[pygame.K_q]:
+            araObj.clawControl(1)
+        elif keys[pygame.K_e]:
+            araObj.clawControl(0)
         else:
             araObj.stopMovement()
 
