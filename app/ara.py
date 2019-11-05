@@ -12,29 +12,30 @@ class ARA:
         # double check these are correct by using Wireshark to packet sniff when connected to ARA's Wi-Fi
         self.ip = "192.168.1.1"
         self.port = 2001
+        self.camera_stream_url = "http://"+self.ip+":8080/?action=stream"
         self.stop = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
         self.forward = bytearray([0xFF, 0x00, 0x04, 0x00, 0xFF])
         self.backward = bytearray([0xFF, 0x00, 0x03, 0x00, 0xFF])
         self.left = bytearray([0xFF, 0x00, 0x01, 0x00, 0xFF])
         self.right = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
-        self.clawOpen = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
-        self.clawClose = bytearray([0xFF, 0x01, 0x04, 0xab, 0xFF])
-        self.clawHorizontal = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
-        self.clawVertical = bytearray([0xFF, 0x01, 0x03, 0xab, 0xFF])
+        self.claw_open_pos = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
+        self.claw_close_pos = bytearray([0xFF, 0x01, 0x04, 0xab, 0xFF])
+        self.claw_horizontal_pos = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
+        self.claw_vertical_pos = bytearray([0xFF, 0x01, 0x03, 0xab, 0xFF])
 
-    def getIP(self):
+    def get_ip(self):
         return self.ip
 
-    def setIP(self, ip):
+    def set_ip(self, ip):
         self.ip = ip
 
-    def getPort(self):
+    def get_port(self):
         return self.port
 
-    def setPort(self, port):
+    def set_port(self, port):
         self.port = port
 
-    def sendCommand(self, command):
+    def send_command_to_ARA(self, command):
         '''
 
         :param: command as a byte array sent over Wi-Fi to ARA
@@ -44,10 +45,10 @@ class ARA:
         '''
 
         ara = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ara.connect((self.getIP(), self.getPort()))
+        ara.connect((self.get_ip(), self.get_port()))
         ara.send(command)
 
-    def stopMovement(self):
+    def stop_movement(self):
         '''
 
         :param: N/A
@@ -57,9 +58,9 @@ class ARA:
         '''
 
         print("Sending stop command.")
-        self.sendCommand(self.stop)
+        self.send_command_to_ARA(self.stop)
 
-    def moveForward(self):
+    def move_forward(self):
         '''
 
         :param: N/A
@@ -69,9 +70,9 @@ class ARA:
         '''
 
         print("Sending forward command.")
-        self.sendCommand(self.forward)
+        self.send_command_to_ARA(self.forward)
 
-    def moveBackward(self):
+    def move_backward(self):
         '''
 
         :param: N/A
@@ -81,9 +82,9 @@ class ARA:
         '''
 
         print("Sending backward command.")
-        self.sendCommand(self.backward)
+        self.send_command_to_ARA(self.backward)
 
-    def turnLeft(self):
+    def turn_left(self):
         '''
 
         :param: N/A
@@ -93,9 +94,9 @@ class ARA:
         '''
 
         print("Sending turn left command.")
-        self.sendCommand(self.left)
+        self.send_command_to_ARA(self.left)
 
-    def turnRight(self):
+    def turn_right(self):
         '''
 
         :param: N/A
@@ -105,9 +106,9 @@ class ARA:
         '''
 
         print("Sending turn right command.")
-        self.sendCommand(self.right)
+        self.send_command_to_ARA(self.right)
 
-    def clawControl(self, pos):
+    def claw_open_or_close(self, pos):
         '''
 
         :param pos: enter 0 to close claw or 1 to open claw
@@ -119,12 +120,12 @@ class ARA:
 
         if pos == 1:
             print("Sending claw open command.")
-            self.sendCommand(self.clawOpen)
+            self.send_command_to_ARA(self.claw_open_pos)
         else:
             print("Sending claw close command.")
-            self.sendCommand(self.clawClose)
+            self.send_command_to_ARA(self.claw_close_pos)
 
-    def clawRotate(self, pos):
+    def claw_rotate(self, pos):
         '''
 
         :param pos: enter 0 to rotate the claw to its vertical position or
@@ -137,11 +138,21 @@ class ARA:
 
         if pos == 1:
             print("Sending claw rotate horizontal command.")
-            self.sendCommand(self.clawHorizontal)
+            self.send_command_to_ARA(self.claw_horizontal_pos)
         else:
             print("Sending claw rotate vertical command.")
-            self.sendCommand(self.clawVertical)
+            self.send_command_to_ARA(self.claw_vertical_pos)
 
+    def open_camera_stream(self):
+        '''
+
+        :param N/A
+        :return: N/A
+
+        Opens ARA's camera stream with a web browser.
+        '''
+
+        webbrowser.open(self.camera_stream_url, new=0, autoraise=True)
 
 # variables used to open socket and send commands
 # MAKE SURE TO CHANGE THE IP ADDRESS TO THE IP OF THE RASPBERRY PI ON ARA
@@ -665,8 +676,9 @@ def controls():
     print("p: tilt camera mid")
     print("[: tilt camera up")
     print("spacebar: starts ARA's camera stream")
-    print("esc: sends text message to user")
+    print("m: sends text message to user")
     print("c: prints these controls")
+    print("ESC: closes the control program")
     print("")
     print("")
     print("")
@@ -1145,31 +1157,34 @@ def constControl():
             done = True
         # while w is pressed, move ARA forward
         elif keys[pygame.K_w]:
-            araObj.moveForward()
+            araObj.move_forward()
         # while s is pressed, move ARA backward
         elif keys[pygame.K_s]:
-            araObj.moveBackward()
+            araObj.move_backward()
         # while a is pressed, turn ARA left
         elif keys[pygame.K_a]:
-            araObj.turnLeft()
+            araObj.turn_left()
         # while d is pressed, turn ARA right
         elif keys[pygame.K_d]:
-            araObj.turnRight()
+            araObj.turn_right()
         # while q is pressed, open ARA's claw
         elif keys[pygame.K_q]:
-            araObj.clawControl(1)
+            araObj.claw_open_or_close(1)
         # while e is pressed, close ARA's claw
         elif keys[pygame.K_e]:
-            araObj.clawControl(0)
+            araObj.claw_open_or_close(0)
         # while z is pressed, rotate ARA's claw vertically
         elif keys[pygame.K_z]:
-            araObj.clawRotate(0)
+            araObj.claw_rotate(0)
         # while x is pressed, rotate ARA's claw horizontally
         elif keys[pygame.K_x]:
-            araObj.clawRotate(1)
+            araObj.claw_rotate(1)
+        # if the spacebar is pressed, open ARA's camera stream
+        elif keys[pygame.K_SPACE]:
+            araObj.open_camera_stream()
         # if no keys are being pressed, stop ARA from moving
         else:
-            araObj.stopMovement()
+            araObj.stop_movement()
 
         # check if the user did something other than holding a key down
         for event in pygame.event.get():
