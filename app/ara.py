@@ -7,17 +7,27 @@ from email.mime.text import MIMEText
 
 # please connect to ARA's Wi-Fi before running program - PASSWORD: 12345678
 class ARA:
-    def __init__(self):
+    def __init__(self, left_speed, right_speed):
         # used to open the socket and send commands (packets) to ARA (Raspberry Pi 3) through its Wi-Fi
         # double check these are correct by using Wireshark to packet sniff when connected to ARA's Wi-Fi
         self.ip = "192.168.1.1"
         self.port = 2001
+
+        # used to open ARA's camera stream
         self.camera_stream_url = "http://"+self.ip+":8080/?action=stream"
+
+        # the speed is passed as a decimal and converted to hexadecimal in the bytearray
+        self.left_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed, 16)), 0xFF])
+        self.right_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed, 16)), 0xFF])
+
+        # used to control the movement of ARA
         self.stop = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
         self.forward = bytearray([0xFF, 0x00, 0x04, 0x00, 0xFF])
         self.backward = bytearray([0xFF, 0x00, 0x03, 0x00, 0xFF])
         self.left = bytearray([0xFF, 0x00, 0x01, 0x00, 0xFF])
         self.right = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
+
+        # used to control ARA's arm and claw
         self.claw_open_pos = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
         self.claw_close_pos = bytearray([0xFF, 0x01, 0x04, 0xab, 0xFF])
         self.claw_horizontal_pos = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
@@ -35,6 +45,18 @@ class ARA:
     def set_port(self, port):
         self.port = port
 
+    def get_left_speed(self):
+        return self.left_speed
+
+    def get_right_speed(self):
+        return self.right_speed
+
+    def set_left_speed(self, left_speed):
+        self.left_speed = left_speed
+
+    def set_right_speed(self, right_speed):
+        self.right_speed = right_speed
+
     def send_command_to_ARA(self, command):
         '''
 
@@ -48,6 +70,20 @@ class ARA:
         ara.connect((self.get_ip(), self.get_port()))
         ara.send(command)
 
+    def initialize_speed(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Initializes the speed of ARA by using the left and right speed attributes defined in the constructor.
+        '''
+
+        print("Sending left speed command.")
+        self.send_command_to_ARA(self.left_speed)
+        print("Sending right speed command.")
+        self.send_command_to_ARA(self.right_speed)
+    
     def stop_movement(self):
         '''
 
@@ -1145,7 +1181,8 @@ def constControl():
     clock = pygame.time.Clock()
 
     print("Initializing ARA...")
-    araObj = ARA()
+    araObj = ARA(90, 90)
+    araObj.initialize_speed()
     controls()
     
     # -------- Main Loop -----------
