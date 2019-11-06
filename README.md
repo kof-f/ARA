@@ -70,9 +70,9 @@ command should work on both Windows and Mac.
   * **p:** tilt camera mid
   * **[:** tilt camera up
   * **spacebar:** starts ARA's camera stream
-  * **m:** sends text message to user
+  * **1:** sends text message to user
   * **c:** prints these controls
-  * **esc:** sends text message to user
+  * **esc:** exits the program
    
  ### DualShock 4 Controller: 
 * **R2:** moves ARA forward 12 inches at a time
