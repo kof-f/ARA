@@ -17,8 +17,8 @@ class ARA:
         self.camera_stream_url = "http://"+self.ip+":8080/?action=stream"
 
         # the speed is passed as a decimal and converted to hexadecimal in the bytearray
-        self.left_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed, 16)), 0xFF])
-        self.right_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed, 16)), 0xFF])
+        self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed, 16)), 0xFF])
+        self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed, 16)), 0xFF])
 
         # used to control the movement of ARA
         self.stop = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
@@ -28,6 +28,7 @@ class ARA:
         self.right = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
 
         # used to control ARA's arm and claw
+        self.claw_pos = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF]) # try changing the third value to 0x00
         self.claw_open_pos = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
         self.claw_close_pos = bytearray([0xFF, 0x01, 0x04, 0xab, 0xFF])
         self.claw_horizontal_pos = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
@@ -46,16 +47,22 @@ class ARA:
         self.port = port
 
     def get_left_speed(self):
-        return self.left_speed
-
-    def get_right_speed(self):
-        return self.right_speed
+        return self.left_motor_speed
 
     def set_left_speed(self, left_speed):
-        self.left_speed = left_speed
+        self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed, 16)), 0xFF])
+
+    def get_right_speed(self):
+        return self.right_motor_speed
 
     def set_right_speed(self, right_speed):
-        self.right_speed = right_speed
+        self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed, 16)), 0xFF])
+
+    def get_claw_pos(self):
+        return self.claw_pos
+
+    def set_claw_pos(self, claw_pos):
+        self.claw_pos = bytearray([0xFF, 0x01, 0x04, int(hex(claw_pos), 16), 0xFF])
 
     def send_command_to_ARA(self, command):
         '''
@@ -80,9 +87,9 @@ class ARA:
         '''
 
         print("Sending left speed command.")
-        self.send_command_to_ARA(self.left_speed)
+        self.send_command_to_ARA(self.left_motor_speed)
         print("Sending right speed command.")
-        self.send_command_to_ARA(self.right_speed)
+        self.send_command_to_ARA(self.right_motor_speed)
     
     def stop_movement(self):
         '''
@@ -143,6 +150,18 @@ class ARA:
 
         print("Sending turn right command.")
         self.send_command_to_ARA(self.right)
+
+    def claw_clench(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends claw clench or release command to ARA based on the claw position attribute
+        defined in the constructor.
+        '''
+        print("Sending claw clench command.")
+        self.send_command_to_ARA(self.claw_pos)
 
     def claw_open_or_close(self, pos):
         '''
@@ -1180,11 +1199,15 @@ def constControl():
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
 
+    # initializes ARA and sets its speed
     print("Initializing ARA...")
     araObj = ARA(90, 90)
     araObj.initialize_speed()
     controls()
-    
+
+    # creates variables to track the current position of the arm and claw
+    claw_current_pos = 56
+
     # -------- Main Loop -----------
     while not done:
         # checking pressed keys
@@ -1206,10 +1229,14 @@ def constControl():
             araObj.turn_right()
         # while q is pressed, open ARA's claw
         elif keys[pygame.K_q]:
-            araObj.claw_open_or_close(1)
+            claw_current_pos -= 1
+            araObj.set_claw_pos(claw_current_pos)
+            araObj.claw_clench()
         # while e is pressed, close ARA's claw
         elif keys[pygame.K_e]:
-            araObj.claw_open_or_close(0)
+            claw_current_pos += 1
+            araObj.set_claw_pos(claw_current_pos)
+            araObj.claw_clench()
         # while z is pressed, rotate ARA's claw vertically
         elif keys[pygame.K_z]:
             araObj.claw_rotate(0)
