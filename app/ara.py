@@ -17,8 +17,8 @@ class ARA:
         self.camera_stream_url = "http://"+self.ip+":8080/?action=stream"
 
         # the speed is passed as a decimal and converted to hexadecimal in the bytearray
-        self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed, 16)), 0xFF])
-        self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed, 16)), 0xFF])
+        self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed), 16), 0xFF])
+        self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed), 16), 0xFF])
 
         # used to control the movement of ARA
         self.stop = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
@@ -50,13 +50,13 @@ class ARA:
         return self.left_motor_speed
 
     def set_left_speed(self, left_speed):
-        self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed, 16)), 0xFF])
+        self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed), 16), 0xFF])
 
     def get_right_speed(self):
         return self.right_motor_speed
 
     def set_right_speed(self, right_speed):
-        self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed, 16)), 0xFF])
+        self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed), 16), 0xFF])
 
     def get_claw_pos(self):
         return self.claw_pos
@@ -213,203 +213,6 @@ class ARA:
 # MAKE SURE TO CHANGE THE IP ADDRESS TO THE IP OF THE RASPBERRY PI ON ARA
 IP = "192.168.1.1"
 PORT = 2001
-
-def stopMovement():
-    '''
-
-    :param N/A
-    :return: N/A
-
-    Sends stop command to ARA while movement keys
-    aren't being pressed in main loop.
-    '''
-
-    # used to send the stop command
-    stopData = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
-
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    c.send(stopData)
-    print("Stop command sent.")
-
-def forward(dist):
-    '''
-
-    :param dist: distance in 6 inches to move ARA forward
-    :return: N/A
-    '''
-
-    # speed for motors (left set to 70, right set to 68)
-    forwardleftSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-    forwardrightSpeed = bytearray([0xFF, 0x02, 0x02, 0x44, 0xFF])
-
-    # used to send the forward command
-    forwardData = bytearray([0xFF, 0x00, 0x04, 0x00, 0xFF])
-
-    # used to send the turn right command
-    turnRightData = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
-
-    # used to send the stop command
-    stopData = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
-
-    print ("Opening socket...")
-    c = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    print ("Socket opened.")
-    print ("Sending left speed for forward command...")
-    c.send(forwardleftSpeed)
-    print ("Command sent.")
-    print ("Sending right speed for forward command...")
-    c.send(forwardrightSpeed)
-    print ("Command sent.")
-
-    for i in range(dist):
-
-        print("Sending forward command...")
-        c.send(forwardData)
-        print("Command sent.")
-        print("Pausing for a second...")
-        time.sleep(1)
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
-        print("Adjusting position based on error.")
-        print("Sending turn right command...")
-        c.send(turnRightData)
-        print("Command sent.")
-        print("Pausing for about 2/10 of a second...")
-        time.sleep(0.150)
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
-
-def backward(dist):
-    '''
-
-    :param dist: distance in 6 inches to move ARA backward
-    :return: N/A
-    '''
-
-    # speed for motors (left set to 68, right set to 70)
-    backwardleftSpeed = bytearray([0xFF, 0x02, 0x01, 0x44, 0xFF])
-    backwardrightSpeed = bytearray([0xFF, 0x02, 0x02, 0x46, 0xFF])
-
-    # used to send the forward command
-    backwardData = bytearray([0xFF, 0x00, 0x03, 0x00, 0xFF])
-
-    # used to send the turn left command
-    turnLeftData = bytearray([0xFF, 0x00, 0x01, 0x00, 0xFF])
-
-    # used to send the stop command
-    stopData = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
-
-    print("Opening socket...")
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    print("Socket opened.")
-    print("Sending left speed for backward command...")
-    c.send(backwardleftSpeed)
-    print("Command sent.")
-    print("Sending right speed for backward command...")
-    c.send(backwardrightSpeed)
-    print("Command sent.")
-
-    for i in range(dist):
-        print("Sending backward command...")
-        c.send(backwardData)
-        print("Command sent.")
-        print("Pausing for a second...")
-        time.sleep(1)
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
-        print("Adjusting position based on error.")
-        print("Sending turn left command...")
-        c.send(turnLeftData)
-        print("Command sent.")
-        print("Pausing for about 1/10 of a second...")
-        time.sleep(0.050)
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
-
-def turnLeft(deg):
-    '''
-
-    :param deg: degrees by an interval of 90 to turn ARA left
-    :param dist: distance in 6 inches to move ARA forward
-    :return: N/A
-    '''
-
-    # speed for motors (left set to 70, right set to 70)
-    turningLeftLeftSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-    turningLeftRightSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-
-    # used to send the turn left command
-    turnLeftData = bytearray([0xFF, 0x00, 0x01, 0x00, 0xFF])
-
-    # used to send the stop command
-    stopData = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
-
-    print("Opening socket...")
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    print("Socket opened.")
-    print("Sending left speed for turn left command...")
-    c.send(turningLeftLeftSpeed)
-    print("Command sent.")
-    print("Sending right speed for turn left command...")
-    c.send(turningLeftRightSpeed)
-    print("Command sent.")
-
-    for i in range(deg):
-        print("Sending turn left command...")
-        c.send(turnLeftData)
-        print("Command sent.")
-        print("Pausing for 3/4 of a second...")
-        time.sleep(0.75)
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
-
-def turnRight(deg):
-    '''
-
-    :param deg: degrees by an interval of 90 to turn ARA right
-    :param dist: distance in 6 inches to move ARA forward
-    :return: N/A
-    '''
-
-    # speed for motors (left set to 70, right set to 70)
-    turningRightLeftSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-    turningRightRightSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-
-    # used to send the turn left command
-    turnRightData = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
-
-    # used to send the stop command
-    stopData = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
-
-    print("Opening socket...")
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    print("Socket opened.")
-    print("Sending left speed for turn right command...")
-    c.send(turningRightLeftSpeed)
-    print("Command sent.")
-    print("Sending right speed for turn right command...")
-    c.send(turningRightRightSpeed)
-    print("Command sent.")
-
-    for i in range(deg):
-        print("Sending turn right command...")
-        c.send(turnRightData)
-        print("Command sent.")
-        print("Pausing for about a second...")
-        time.sleep(0.85)
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
 
 def clawClench(pos):
     '''
@@ -1042,105 +845,6 @@ def commandARA():
     # on exit.pp
     pygame.quit()
 
-def constForward():
-    '''
-
-    :param N/A
-    :return: N/A
-
-    Sends forward command to ARA while the
-    'w' key is being pressed.
-    '''
-
-    # speed for motors (left set to 70, right set to 68)
-    forwardleftSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-    forwardrightSpeed = bytearray([0xFF, 0x02, 0x02, 0x44, 0xFF])
-
-    # used to send the forward command
-    forwardData = bytearray([0xFF, 0x00, 0x04, 0x00, 0xFF])
-
-    # opens socket and sends speed to motors for forward command
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    c.send(forwardleftSpeed)
-    c.send(forwardrightSpeed)
-    c.send(forwardData)
-    print("Forward command sent.")
-
-def constBackward():
-    '''
-
-    :param N/A
-    :return: N/A
-
-    Sends backward command to ARA while the
-    's' key is being pressed.
-    '''
-
-    # speed for motors on ARA (left set to 68, right set to 70)
-    backwardleftSpeed = bytearray([0xFF, 0x02, 0x01, 0x44, 0xFF])
-    backwardrightSpeed = bytearray([0xFF, 0x02, 0x02, 0x46, 0xFF])
-
-    # used to send the backward command
-    backwardData = bytearray([0xFF, 0x00, 0x03, 0x00, 0xFF])
-
-    # opens socket and sends speed to motors for backwards command
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    c.send(backwardleftSpeed)
-    c.send(backwardrightSpeed)
-    c.send(backwardData)
-    print("Backward command sent.")
-
-def constTurnLeft():
-    '''
-
-    :param: N/A
-    :return: N/A
-
-    Sends turn left command to ARA while the
-    'a' key is being pressed.
-    '''
-
-    # speed for motors (left set to 70, right set to 70)
-    turningLeftLeftSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-    turningLeftRightSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-
-    # used to send the turn left command
-    turnLeftData = bytearray([0xFF, 0x00, 0x01, 0x00, 0xFF])
-
-    # opens socket and sends speed to motors for turning ARA left
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    c.send(turningLeftLeftSpeed)
-    c.send(turningLeftRightSpeed)
-    c.send(turnLeftData)
-    print("Turn left command sent.")
-
-def constTurnRight():
-    '''
-
-    :param: N/A
-    :return: N/A
-
-    Sends the turn right command to ARA while the
-    'd' key is being pressed.
-    '''
-
-    # speed for motors (left set to 70, right set to 70)
-    turningRightLeftSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-    turningRightRightSpeed = bytearray([0xFF, 0x02, 0x01, 0x46, 0xFF])
-
-    # used to send the turn left command
-    turnRightData = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
-
-    # opens
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    c.send(turningRightLeftSpeed)
-    c.send(turningRightRightSpeed)
-    c.send(turnRightData)
-    print("Turn right command sent.")
 
 def constControl():
     '''
@@ -1206,7 +910,7 @@ def constControl():
     controls()
 
     # creates variables to track the current position of the arm and claw
-    claw_current_pos = 56
+    claw_current_pos = 86
 
     # -------- Main Loop -----------
     while not done:
@@ -1228,12 +932,12 @@ def constControl():
         elif keys[pygame.K_d]:
             araObj.turn_right()
         # while q is pressed, open ARA's claw
-        elif keys[pygame.K_q]:
+        elif keys[pygame.K_q] and claw_current_pos > 86:
             claw_current_pos -= 1
             araObj.set_claw_pos(claw_current_pos)
             araObj.claw_clench()
         # while e is pressed, close ARA's claw
-        elif keys[pygame.K_e]:
+        elif keys[pygame.K_e] and claw_current_pos < 171:
             claw_current_pos += 1
             araObj.set_claw_pos(claw_current_pos)
             araObj.claw_clench()
