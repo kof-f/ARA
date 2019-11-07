@@ -27,12 +27,13 @@ class ARA:
         self.left = bytearray([0xFF, 0x00, 0x01, 0x00, 0xFF])
         self.right = bytearray([0xFF, 0x00, 0x02, 0x00, 0xFF])
 
-        # used to control ARA's arm and claw
-        self.claw_pos = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF]) # try changing the third value to 0x00
-        self.claw_open_pos = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
-        self.claw_close_pos = bytearray([0xFF, 0x01, 0x04, 0xab, 0xFF])
-        self.claw_horizontal_pos = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
-        self.claw_vertical_pos = bytearray([0xFF, 0x01, 0x03, 0xab, 0xFF])
+        # used to control ARA's claw
+        self.claw_clench_pos = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
+        self.claw_rotate_pos = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
+
+        # used to control ARA's arm
+        self.arm_mid_pos = bytearray([0xFF, 0x01, 0x02, 0x56, 0xFF]) # set to the starting pos (I believe this is mid)
+        self.arm_base_pos = bytearray([0xFF, 0x01, 0x01, 0x56, 0xFF]) # set to the starting pos (I believe this is mid)
 
     def get_ip(self):
         return self.ip
@@ -58,11 +59,29 @@ class ARA:
     def set_right_speed(self, right_speed):
         self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed), 16), 0xFF])
 
-    def get_claw_pos(self):
-        return self.claw_pos
+    def get_claw_clench_pos(self):
+        return self.claw_clench_pos
 
-    def set_claw_pos(self, claw_pos):
-        self.claw_pos = bytearray([0xFF, 0x01, 0x04, int(hex(claw_pos), 16), 0xFF])
+    def set_claw_clench_pos(self, claw_clench_pos):
+        self.claw_clench_pos = bytearray([0xFF, 0x01, 0x04, int(hex(claw_clench_pos), 16), 0xFF])
+
+    def get_claw_rotate_pos(self):
+        return self.claw_rotate_pos
+
+    def set_claw_rotate_pos(self, claw_rotate_pos):
+        self.claw_clench_pos = bytearray([0xFF, 0x01, 0x03, int(hex(claw_rotate_pos), 16), 0xFF])
+
+    def get_arm_mid_pos(self):
+        return self.arm_mid_pos
+
+    def set_arm_mid_pos(self, arm_mid_pos):
+        self.arm_mid_pos = bytearray([0xFF, 0x01, 0x02, int(hex(arm_mid_pos), 16), 0xFF])
+
+    def get_arm_base_pos(self):
+        return self.arm_base_pos
+
+    def set_arm_base_pos(self, arm_base_pos):
+        self.claw_clench_pos = bytearray([0xFF, 0x01, 0x01, int(hex(arm_base_pos), 16), 0xFF])
 
     def send_command_to_ARA(self, command):
         '''
@@ -157,46 +176,24 @@ class ARA:
         :param: N/A
         :return: N/A
 
-        Sends claw clench or release command to ARA based on the claw position attribute
+        Sends claw clench or release command to ARA using the claw position attribute
         defined in the constructor.
         '''
         print("Sending claw clench command.")
-        self.send_command_to_ARA(self.claw_pos)
+        self.send_command_to_ARA(self.claw_clench_pos)
 
-    def claw_open_or_close(self, pos):
+    def claw_rotate(self):
         '''
 
-        :param pos: enter 0 to close claw or 1 to open claw
+        :param: N/A
         :return: N/A
 
-        Sends claw open or close command to ARA using the claw open and close attributes
-        defined in the constructor.
+        Sends claw rotate command to ARA using the claw rotate attributes defined in
+        the constructor.
         '''
 
-        if pos == 1:
-            print("Sending claw open command.")
-            self.send_command_to_ARA(self.claw_open_pos)
-        else:
-            print("Sending claw close command.")
-            self.send_command_to_ARA(self.claw_close_pos)
-
-    def claw_rotate(self, pos):
-        '''
-
-        :param pos: enter 0 to rotate the claw to its vertical position or
-        1 to rotate it to its horizontal position
-        :return: N/A
-
-        Sends claw rotate command to ARA using the claw horizontal and vertical attributes
-        defined in the constructor.
-        '''
-
-        if pos == 1:
-            print("Sending claw rotate horizontal command.")
-            self.send_command_to_ARA(self.claw_horizontal_pos)
-        else:
-            print("Sending claw rotate vertical command.")
-            self.send_command_to_ARA(self.claw_vertical_pos)
+        print("Sending claw rotate command.")
+        self.send_command_to_ARA(self.claw_rotate_pos)
 
     def open_camera_stream(self):
         '''
@@ -213,77 +210,6 @@ class ARA:
 # MAKE SURE TO CHANGE THE IP ADDRESS TO THE IP OF THE RASPBERRY PI ON ARA
 IP = "192.168.1.1"
 PORT = 2001
-
-def clawClench(pos):
-    '''
-
-    :param pos: enter 0 to clench claw or 1 to open
-    :return: N/A
-    '''
-
-    # used to send the claw clench command
-    clawClenchDataOpen = bytearray([0xFF, 0x01, 0x04, 0x56, 0xFF])
-    clawClenchDataClose = bytearray([0xFF, 0x01, 0x04, 0xab, 0xFF])
-
-    # used to send the stop command
-    stopData = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
-
-    print("Opening socket...")
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    print("Socket opened.")
-
-    if pos == 1:
-        print("Sending claw open command...")
-        c.send(clawClenchDataOpen)
-        print("Claw open command sent.")
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
-
-    else:
-        print("Sending claw close command...")
-        c.send(clawClenchDataClose)
-        print("Claw close command sent.")
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
-
-def clawRotate(pos):
-    '''
-
-    :param pos: enter 0 to rotate claw vertical or 1 to rotate it horizontally
-    :return: N/A
-    '''
-
-    # used to send the claw rotate command
-    clawRotateDataPosHor = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
-    clawRotateDataPosVert = bytearray([0xFF, 0x01, 0x03, 0xab, 0xFF])
-
-    # used to send the stop command
-    stopData = bytearray([0xFF, 0x00, 0x00, 0x00, 0xFF])
-
-    print("Opening socket...")
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((IP, PORT))
-    print("Socket opened.")
-
-    if pos == 1:
-        print("Sending claw rotate horizontal command...")
-        c.send(clawRotateDataPosHor)
-        print("Claw rotate horizontal command sent.")
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
-
-
-    else:
-        print("Sending claw rotate vertical command...")
-        c.send(clawRotateDataPosVert)
-        print("Claw rotate vertical command sent.")
-        print("Sending stop command...")
-        c.send(stopData)
-        print("Command sent.")
 
 def armMidMove(pos):
     '''
@@ -460,11 +386,6 @@ def cameraTilt(pos):
         print("Sending stop command...")
         c.send(stopData)
         print("Command sent.")
-
-def cameraStream():
-
-    # opening camera stream (http://192.168.1.1:8080/?action=stream)
-    webbrowser.open("http://192.168.1.1:8080/?action=stream", new=0, autoraise=True)
 
 def sms():
 
@@ -905,12 +826,14 @@ def constControl():
 
     # initializes ARA and sets its speed
     print("Initializing ARA...")
-    araObj = ARA(90, 90)
-    araObj.initialize_speed()
+    command_ARA = ARA(90, 90)
+    command_ARA.initialize_speed()
+
     controls()
 
-    # creates variables to track the current position of the arm and claw
-    claw_current_pos = 86
+    # variables to track the current position of the arm and claw
+    claw_clench_current_pos = 86
+    claw_rotate_current_pos = 86
 
     # -------- Main Loop -----------
     while not done:
@@ -921,38 +844,42 @@ def constControl():
             done = True
         # while w is pressed, move ARA forward
         elif keys[pygame.K_w]:
-            araObj.move_forward()
+            command_ARA.move_forward()
         # while s is pressed, move ARA backward
         elif keys[pygame.K_s]:
-            araObj.move_backward()
+            command_ARA.move_backward()
         # while a is pressed, turn ARA left
         elif keys[pygame.K_a]:
-            araObj.turn_left()
+            command_ARA.turn_left()
         # while d is pressed, turn ARA right
         elif keys[pygame.K_d]:
-            araObj.turn_right()
+            command_ARA.turn_right()
         # while q is pressed, open ARA's claw
-        elif keys[pygame.K_q] and claw_current_pos > 86:
-            claw_current_pos -= 1
-            araObj.set_claw_pos(claw_current_pos)
-            araObj.claw_clench()
+        elif keys[pygame.K_q] and claw_clench_current_pos > 86:
+            claw_clench_current_pos -= 2
+            command_ARA.set_claw_clench_pos(claw_clench_current_pos)
+            command_ARA.claw_clench()
         # while e is pressed, close ARA's claw
-        elif keys[pygame.K_e] and claw_current_pos < 171:
-            claw_current_pos += 1
-            araObj.set_claw_pos(claw_current_pos)
-            araObj.claw_clench()
-        # while z is pressed, rotate ARA's claw vertically
+        elif keys[pygame.K_e] and claw_clench_current_pos < 171:
+            claw_clench_current_pos += 2
+            command_ARA.set_claw_clench_pos(claw_clench_current_pos)
+            command_ARA.claw_clench()
+        # while z is pressed, rotate ARA's claw counterclockwise
         elif keys[pygame.K_z]:
-            araObj.claw_rotate(0)
-        # while x is pressed, rotate ARA's claw horizontally
+            claw_rotate_current_pos += 2
+            command_ARA.set_claw_rotate_pos(claw_rotate_current_pos)
+            command_ARA.claw_rotate()
+        # while x is pressed, rotate ARA's claw clockwise
         elif keys[pygame.K_x]:
-            araObj.claw_rotate(1)
+            claw_rotate_current_pos -= 2
+            command_ARA.set_claw_rotate_pos(claw_rotate_current_pos)
+            command_ARA.claw_rotate()
         # if the spacebar is pressed, open ARA's camera stream
         elif keys[pygame.K_SPACE]:
-            araObj.open_camera_stream()
+            command_ARA.open_camera_stream()
         # if no keys are being pressed, stop ARA from moving
         else:
-            araObj.stop_movement()
+            command_ARA.stop_movement()
 
         # check if the user did something other than holding a key down
         for event in pygame.event.get():
