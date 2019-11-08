@@ -55,8 +55,8 @@ command should work on both Windows and Mac.
   * **d:** turns ARA right 90 degrees and moves her forward 6 inches
   * **q:** open ARA's claw
   * **e:** close ARA's claw
-  * **z:** rotate ARA's claw to a vertical position
-  * **x:** rotate ARA's claw to a horizontal position
+  * **z:** rotate ARA's claw clockwise
+  * **x:** rotate ARA's claw counterclockwise
   * **i:** move arm mid to highest position
   * **k:** move arm mid to middle position
   * **,:** move arm mid to lowest position

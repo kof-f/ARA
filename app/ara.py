@@ -69,7 +69,7 @@ class ARA:
         return self.claw_rotate_pos
 
     def set_claw_rotate_pos(self, claw_rotate_pos):
-        self.claw_clench_pos = bytearray([0xFF, 0x01, 0x03, int(hex(claw_rotate_pos), 16), 0xFF])
+        self.claw_rotate_pos = bytearray([0xFF, 0x01, 0x03, int(hex(claw_rotate_pos), 16), 0xFF])
 
     def get_arm_mid_pos(self):
         return self.arm_mid_pos
@@ -865,12 +865,12 @@ def constControl():
             command_ARA.set_claw_clench_pos(claw_clench_current_pos)
             command_ARA.claw_clench()
         # while z is pressed, rotate ARA's claw counterclockwise
-        elif keys[pygame.K_z]:
+        elif keys[pygame.K_z] and claw_rotate_current_pos < 256:
             claw_rotate_current_pos += 2
             command_ARA.set_claw_rotate_pos(claw_rotate_current_pos)
             command_ARA.claw_rotate()
         # while x is pressed, rotate ARA's claw clockwise
-        elif keys[pygame.K_x]:
+        elif keys[pygame.K_x] and claw_rotate_current_pos > 0:
             claw_rotate_current_pos -= 2
             command_ARA.set_claw_rotate_pos(claw_rotate_current_pos)
             command_ARA.claw_rotate()
