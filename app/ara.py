@@ -50,25 +50,51 @@ class ARA:
     def get_left_speed(self):
         return self.left_motor_speed
 
-    def set_left_speed(self, left_speed):
-        self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed), 16), 0xFF])
+    def set_left_speed(self, left_motor_speed):
+        # setting boundaries for the left motor speed
+        # min = 20 and max = 100
+        if left_motor_speed > 100:
+            left_motor_speed = 100
+        elif left_motor_speed < 20:
+            left_motor_speed = 20
+        self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_motor_speed), 16), 0xFF])
 
     def get_right_speed(self):
         return self.right_motor_speed
 
-    def set_right_speed(self, right_speed):
-        self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_speed), 16), 0xFF])
+    def set_right_speed(self, right_motor_speed):
+        # setting boundaries for the right motor speed
+        # min = 20 and max = 100
+        if right_motor_speed > 100:
+            right_motor_speed = 100
+        elif right_motor_speed < 20:
+            right_motor_speed = 20
+        self.right_motor_speed = bytearray([0xFF, 0x02, 0x02, int(hex(right_motor_speed), 16), 0xFF])
 
     def get_claw_clench_pos(self):
         return self.claw_clench_pos
 
     def set_claw_clench_pos(self, claw_clench_pos):
+        # setting boundaries for the claw clench position
+        # the claw is fully open at 86 and fully closed at 171
+        # so there's no need to accept input outside of those boundaries
+        if claw_clench_pos < 86:
+            claw_clench_pos = 86
+        elif claw_clench_pos > 171:
+            claw_clench_pos = 171
         self.claw_clench_pos = bytearray([0xFF, 0x01, 0x04, int(hex(claw_clench_pos), 16), 0xFF])
 
     def get_claw_rotate_pos(self):
         return self.claw_rotate_pos
 
     def set_claw_rotate_pos(self, claw_rotate_pos):
+        # setting boundaries for the claw rotate position
+        # the claw is horizontal at 86 and horizontal at 171
+        # so there's no need to accept input outside of those boundaries
+        if claw_rotate_pos < 86:
+            claw_rotate_pos = 86
+        elif claw_rotate_pos > 171:
+            claw_rotate_pos = 171
         self.claw_rotate_pos = bytearray([0xFF, 0x01, 0x03, int(hex(claw_rotate_pos), 16), 0xFF])
 
     def get_arm_mid_pos(self):
