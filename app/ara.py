@@ -101,12 +101,26 @@ class ARA:
         return self.arm_mid_pos
 
     def set_arm_mid_pos(self, arm_mid_pos):
+        # setting boundaries for the arm mid position
+        # at 0 it's at its lowest and at 171 it's at its highest
+        # so there's no need to accept input outside of those boundaries
+        if arm_mid_pos < 0:
+            claw_rotate_pos = 0
+        elif arm_mid_pos > 171:
+            claw_rotate_pos = 171
         self.arm_mid_pos = bytearray([0xFF, 0x01, 0x02, int(hex(arm_mid_pos), 16), 0xFF])
 
     def get_arm_base_pos(self):
         return self.arm_base_pos
 
     def set_arm_base_pos(self, arm_base_pos):
+        # setting boundaries for the arm base position
+        # at 0 it's at its lowest and at 171 it's at its highest
+        # so there's no need to accept input outside of those boundaries
+        if arm_base_pos < 0:
+            claw_rotate_pos = 0
+        elif arm_base_pos > 171:
+            claw_rotate_pos = 171
         self.claw_clench_pos = bytearray([0xFF, 0x01, 0x01, int(hex(arm_base_pos), 16), 0xFF])
 
     def send_command_to_ARA(self, command):
@@ -221,6 +235,32 @@ class ARA:
         print("Sending claw rotate command.")
         self.send_command_to_ARA(self.claw_rotate_pos)
 
+    def arm_mid_move(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends arm mid move command to ARA using the arm mid attributes defined in
+        the constructor.
+        '''
+
+        print("Sending arm mid move command.")
+        self.send_command_to_ARA(self.arm_mid_pos)
+
+    def arm_base_move(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends arm base move command to ARA using the arm base attributes defined in
+        the constructor.
+        '''
+
+        print("Sending arm base move command.")
+        self.send_command_to_ARA(self.arm_base_pos)
+
     def open_camera_stream(self):
         '''
 
@@ -230,6 +270,7 @@ class ARA:
         Opens ARA's camera stream with a web browser.
         '''
 
+        print("Opening ARA's camera stream.")
         webbrowser.open(self.camera_stream_url, new=0, autoraise=True)
 
 # variables used to open socket and send commands
@@ -860,6 +901,8 @@ def constControl():
     # variables to track the current position of the arm and claw
     claw_clench_current_pos = 86
     claw_rotate_current_pos = 86
+    arm_mid_current_pos = 86
+    arm_base_current_pos = 86
 
     # -------- Main Loop -----------
     while not done:
@@ -881,25 +924,45 @@ def constControl():
         elif keys[pygame.K_d]:
             command_ARA.turn_right()
         # while q is pressed, open ARA's claw
-        elif keys[pygame.K_q] and claw_clench_current_pos > 86:
+        elif keys[pygame.K_q]:
             claw_clench_current_pos -= 2
             command_ARA.set_claw_clench_pos(claw_clench_current_pos)
             command_ARA.claw_clench()
         # while e is pressed, close ARA's claw
-        elif keys[pygame.K_e] and claw_clench_current_pos < 171:
+        elif keys[pygame.K_e]:
             claw_clench_current_pos += 2
             command_ARA.set_claw_clench_pos(claw_clench_current_pos)
             command_ARA.claw_clench()
         # while z is pressed, rotate ARA's claw counterclockwise
-        elif keys[pygame.K_z] and claw_rotate_current_pos < 256:
+        elif keys[pygame.K_z]:
             claw_rotate_current_pos += 2
             command_ARA.set_claw_rotate_pos(claw_rotate_current_pos)
             command_ARA.claw_rotate()
         # while x is pressed, rotate ARA's claw clockwise
-        elif keys[pygame.K_x] and claw_rotate_current_pos > 0:
+        elif keys[pygame.K_x]:
             claw_rotate_current_pos -= 2
             command_ARA.set_claw_rotate_pos(claw_rotate_current_pos)
             command_ARA.claw_rotate()
+        # while i is pressed, move ARA's middle arm higher
+        elif keys[pygame.K_i]:
+            arm_mid_current_pos += 2
+            command_ARA.set_arm_mid_pos(arm_mid_current_pos)
+            command_ARA.arm_mid_move()
+        # while , is pressed, move ARA's middle arm lower
+        elif keys[pygame.K_COMMA]:
+            arm_mid_current_pos -= 2
+            command_ARA.set_arm_mid_pos(arm_mid_current_pos)
+            command_ARA.arm_mid_move()
+        # while u is pressed, move ARA's base arm higher
+        elif keys[pygame.K_u]:
+            arm_base_current_pos += 2
+            command_ARA.set_arm_base_pos(arm_base_current_pos)
+            command_ARA.arm_base_move()
+        # while m is pressed, move ARA's base arm lower
+        elif keys[pygame.K_m]:
+            arm_base_current_pos -= 2
+            command_ARA.set_arm_base_pos(arm_base_current_pos)
+            command_ARA.arm_base_move()
         # if the spacebar is pressed, open ARA's camera stream
         elif keys[pygame.K_SPACE]:
             command_ARA.open_camera_stream()
