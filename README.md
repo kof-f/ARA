@@ -81,8 +81,8 @@ command should work on both Windows and Mac.
 * **R1:** turns ARA right 90 degrees and moves her forward 6 inches
 * **circle:** open ARA's claw
 * **cross:** close ARA's claw
-* **square:** rotate ARA's claw counterclockwise
-* **triangle:** rotate ARA's claw clockwise
+* **square:** rotate ARA's claw clockwise
+* **triangle:** rotate ARA's claw counterclockwise
 * **LS Up:** move arm mid to highest position
 * **L3:** move arm mid to middle position
 * **LS Down:** move arm mid to lowest position
