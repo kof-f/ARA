@@ -105,9 +105,9 @@ class ARA:
         # at 0 it's at its lowest and at 171 it's at its highest
         # so there's no need to accept input outside of those boundaries
         if arm_mid_pos < 0:
-            claw_rotate_pos = 0
+            arm_mid_pos = 0
         elif arm_mid_pos > 171:
-            claw_rotate_pos = 171
+            arm_mid_pos = 171
         self.arm_mid_pos = bytearray([0xFF, 0x01, 0x02, int(hex(arm_mid_pos), 16), 0xFF])
 
     def get_arm_base_pos(self):
@@ -118,10 +118,10 @@ class ARA:
         # at 0 it's at its lowest and at 171 it's at its highest
         # so there's no need to accept input outside of those boundaries
         if arm_base_pos < 0:
-            claw_rotate_pos = 0
+            arm_base_pos = 0
         elif arm_base_pos > 171:
-            claw_rotate_pos = 171
-        self.claw_clench_pos = bytearray([0xFF, 0x01, 0x01, int(hex(arm_base_pos), 16), 0xFF])
+            arm_base_pos = 171
+        self.arm_base_pos = bytearray([0xFF, 0x01, 0x01, int(hex(arm_base_pos), 16), 0xFF])
 
     def send_command_to_ARA(self, command):
         '''
@@ -902,7 +902,7 @@ def constControl():
     claw_clench_current_pos = 86
     claw_rotate_current_pos = 86
     arm_mid_current_pos = 86
-    arm_base_current_pos = 86
+    arm_base_current_pos = 171
 
     # -------- Main Loop -----------
     while not done:
