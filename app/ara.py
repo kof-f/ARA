@@ -32,8 +32,17 @@ class ARA:
         self.claw_rotate_pos = bytearray([0xFF, 0x01, 0x03, 0x56, 0xFF])
 
         # used to control ARA's arm
-        self.arm_mid_pos = bytearray([0xFF, 0x01, 0x02, 0x56, 0xFF]) # set to the starting pos (I believe this is mid)
-        self.arm_base_pos = bytearray([0xFF, 0x01, 0x01, 0x56, 0xFF]) # set to the starting pos (I believe this is mid)
+        self.arm_mid_pos = bytearray([0xFF, 0x01, 0x02, 0x56, 0xFF])
+        self.arm_base_pos = bytearray([0xFF, 0x01, 0x01, 0x56, 0xFF])
+
+        # used to control the camera pan and tilt
+        self.camera_pan_pos = bytearray([0xFF, 0x01, 0x07, 0x56, 0xFF])
+        self.camera_tilt_pos = bytearray([0xFF, 0x01, 0x08, 0x32, 0xFF])
+        # cameraTiltDataMid = bytearray([0xFF, 0x01, 0x08, 0x32, 0xFF])
+        # cameraTiltDataUp = bytearray([0xFF, 0x01, 0x08, 0xab, 0xFF])
+        # cameraPanDataMid = bytearray([0xFF, 0x01, 0x07, 0x56, 0xFF])
+        # cameraPanDataLeft = bytearray([0xFF, 0x01, 0x07, 0xab, 0xFF])
+
 
     def get_ip(self):
         return self.ip
@@ -123,6 +132,32 @@ class ARA:
             arm_base_pos = 171
         self.arm_base_pos = bytearray([0xFF, 0x01, 0x01, int(hex(arm_base_pos), 16), 0xFF])
 
+    def get_camera_pan_pos(self):
+        return self.camera_pan_pos
+
+    def set_camera_pan_pos(self, camera_pan_pos):
+        # setting boundaries for the camera pan position
+        # at 171 it's fully looking left and at 43 it's fully looking right
+        # so there's no need to accept input outside of those boundaries
+        if camera_pan_pos < 43:
+            camera_pan_pos = 43
+        elif camera_pan_pos > 171:
+            camera_pan_pos = 171
+        self.camera_pan_pos = bytearray([0xFF, 0x01, 0x07, int(hex(camera_pan_pos), 16), 0xFF])
+
+    def get_camera_tilt_pos(self):
+        return self.camera_tilt_pos
+
+    def set_camera_tilt_pos(self, camera_tilt_pos):
+        # setting boundaries for the camera pan position
+        # at 0 it's fully tilted down and at 171 it's fully tilted up
+        # so there's no need to accept input outside of those boundaries
+        if camera_tilt_pos < 0:
+            camera_tilt_pos = 0
+        elif camera_tilt_pos > 171:
+            camera_tilt_pos = 171
+        self.camera_tilt_pos = bytearray([0xFF, 0x01, 0x08, int(hex(camera_tilt_pos), 16), 0xFF])
+
     def send_command_to_ARA(self, command):
         '''
 
@@ -159,7 +194,6 @@ class ARA:
         Sends stop command to ARA using stop attribute defined in the constructor.
         '''
 
-        print("Sending stop command.")
         self.send_command_to_ARA(self.stop)
 
     def move_forward(self):
@@ -219,6 +253,7 @@ class ARA:
         Sends claw clench or release command to ARA using the claw position attribute
         defined in the constructor.
         '''
+
         print("Sending claw clench command.")
         self.send_command_to_ARA(self.claw_clench_pos)
 
@@ -260,6 +295,32 @@ class ARA:
 
         print("Sending arm base move command.")
         self.send_command_to_ARA(self.arm_base_pos)
+
+    def camera_pan(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends camera pan command to ARA using the camera pan attributes defined in
+        the constructor.
+        '''
+
+        print("Sending camera pan command.")
+        self.send_command_to_ARA(self.camera_pan_pos)
+
+    def camera_tilt(self):
+        '''
+
+        :param: N/A
+        :return: N/A
+
+        Sends camera tilt command to ARA using the camera pan attributes defined in
+        the constructor.
+        '''
+
+        print("Sending camera tilt command.")
+        self.send_command_to_ARA(self.camera_tilt_pos)
 
     def open_camera_stream(self):
         '''
@@ -893,9 +954,8 @@ def constControl():
 
     # initializes ARA and sets its speed
     print("Initializing ARA...")
-    command_ARA = ARA(90, 90)
+    command_ARA = ARA(80, 80)
     command_ARA.initialize_speed()
-
     controls()
 
     # variables to track the current position of the arm and claw
@@ -904,15 +964,16 @@ def constControl():
     arm_mid_current_pos = 86
     arm_base_current_pos = 171
 
+    # variables to track the current position of the camera
+    camera_pan_pos = 86
+    camera_tilt_pos = 50
+
     # -------- Main Loop -----------
     while not done:
         # checking pressed keys
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_ESCAPE]:
-            print("Exiting the program.")
-            done = True
         # while w is pressed, move ARA forward
-        elif keys[pygame.K_w]:
+        if keys[pygame.K_w]:
             command_ARA.move_forward()
         # while s is pressed, move ARA backward
         elif keys[pygame.K_s]:
@@ -963,9 +1024,26 @@ def constControl():
             arm_base_current_pos -= 2
             command_ARA.set_arm_base_pos(arm_base_current_pos)
             command_ARA.arm_base_move()
-        # if the spacebar is pressed, open ARA's camera stream
-        elif keys[pygame.K_SPACE]:
-            command_ARA.open_camera_stream()
+        # while l is pressed, pan ARA's camera left
+        elif keys[pygame.K_l]:
+            camera_pan_pos += 2
+            command_ARA.set_camera_pan_pos(camera_pan_pos)
+            command_ARA.camera_pan()
+        # while ' is pressed, pan ARA's camera right
+        elif keys[pygame.K_QUOTE]:
+            camera_pan_pos -= 2
+            command_ARA.set_camera_pan_pos(camera_pan_pos)
+            command_ARA.camera_pan()
+        # while [ is pressed, pan ARA's camera right
+        elif keys[pygame.K_LEFTBRACKET]:
+            camera_tilt_pos += 2
+            command_ARA.set_camera_tilt_pos(camera_tilt_pos)
+            command_ARA.camera_tilt()
+        # while o is pressed, pan ARA's camera right
+        elif keys[pygame.K_o]:
+            camera_tilt_pos -= 2
+            command_ARA.set_camera_tilt_pos(camera_tilt_pos)
+            command_ARA.camera_tilt()
         # if no keys are being pressed, stop ARA from moving
         else:
             command_ARA.stop_movement()
@@ -976,6 +1054,14 @@ def constControl():
                 # If user clicked close
                 print("Exiting the program.")
                 done = True
+            elif event.type == pygame.KEYDOWN:
+                # if the ESC key is pressed, close the program
+                if event.key == pygame.K_SPACE:
+                    print("Exiting the program.")
+                # if the spacebar is pressed, open ARA's camera stream
+                if event.key == pygame.K_SPACE:
+                    command_ARA.open_camera_stream()
+
 
         # Set the screen background
         screen.fill(BLACK)

@@ -95,7 +95,7 @@ command should work on both Windows and Mac.
 * **Tilt Down:** tilt camera mid
 * **Down:** tilt camera down
 * **Up:** tilt camera up
-* **PS Button:** starts ARA's camera stream
+* **PS Button:** opens ARA's camera stream
 * **Share button:** sends text message to user
 * **options:** prints these controls
 
