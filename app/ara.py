@@ -5,16 +5,17 @@ import pygame
 import smtplib
 from email.mime.text import MIMEText
 
+
 # please connect to ARA's Wi-Fi before running program - PASSWORD: 12345678
 class ARA:
-    def __init__(self, left_speed, right_speed):
+    def __init__(self, left_speed=80, right_speed=80):
         # used to open the socket and send commands (packets) to ARA (Raspberry Pi 3) through its Wi-Fi
         # double check these are correct by using Wireshark to packet sniff when connected to ARA's Wi-Fi
         self.ip = "192.168.1.1"
         self.port = 2001
 
         # used to open ARA's camera stream
-        self.camera_stream_url = "http://"+self.ip+":8080/?action=stream"
+        self.camera_stream_url = "http://" + self.ip + ":8080/?action=stream"
 
         # the speed is passed as a decimal and converted to hexadecimal in the bytearray
         self.left_motor_speed = bytearray([0xFF, 0x02, 0x01, int(hex(left_speed), 16), 0xFF])
@@ -42,7 +43,6 @@ class ARA:
         # cameraTiltDataUp = bytearray([0xFF, 0x01, 0x08, 0xab, 0xFF])
         # cameraPanDataMid = bytearray([0xFF, 0x01, 0x07, 0x56, 0xFF])
         # cameraPanDataLeft = bytearray([0xFF, 0x01, 0x07, 0xab, 0xFF])
-
 
     def get_ip(self):
         return self.ip
@@ -184,7 +184,7 @@ class ARA:
         self.send_command_to_ARA(self.left_motor_speed)
         print("Sending right speed command.")
         self.send_command_to_ARA(self.right_motor_speed)
-    
+
     def stop_movement(self):
         '''
 
@@ -334,10 +334,12 @@ class ARA:
         print("Opening ARA's camera stream.")
         webbrowser.open(self.camera_stream_url, new=0, autoraise=True)
 
+
 # variables used to open socket and send commands
 # MAKE SURE TO CHANGE THE IP ADDRESS TO THE IP OF THE RASPBERRY PI ON ARA
 IP = "192.168.1.1"
 PORT = 2001
+
 
 def armMidMove(pos):
     '''
@@ -383,6 +385,7 @@ def armMidMove(pos):
         c.send(stopData)
         print("Command sent.")
 
+
 def armBaseMove(pos):
     '''
 
@@ -426,6 +429,7 @@ def armBaseMove(pos):
         print("Sending stop command...")
         c.send(stopData)
         print("Command sent.")
+
 
 def cameraPan(pos):
     '''
@@ -471,6 +475,7 @@ def cameraPan(pos):
         c.send(stopData)
         print("Command sent.")
 
+
 def cameraTilt(pos):
     '''
 
@@ -515,8 +520,8 @@ def cameraTilt(pos):
         c.send(stopData)
         print("Command sent.")
 
-def sms():
 
+def sms():
     # Establish a secure session with gmail's outgoing SMTP server using your gmail account
     server = smtplib.SMTP("smtp.gmail.com", 587)
 
@@ -558,8 +563,8 @@ def sms():
     msg["To"] = "5163126540@pm.sprint.com"
     server.send_message(msg)
 
-def controls():
 
+def controls():
     print("KEYBOARD CONTROLS: ")
     print("________________________")
     print("w: moves ARA forward 12 inches at a time")
@@ -614,6 +619,7 @@ def controls():
     print("PS Button: starts ARA's camera stream")
     print("Share button: sends text message to user")
     print("options: prints these controls")
+
 
 def testARA():
     '''
@@ -674,6 +680,7 @@ def testARA():
 
     print(" -------------------------------------- TEST FINISHED --------------------------------------")
 
+
 def commandARA():
     '''
     controls ARA while using a 2-D environment
@@ -727,7 +734,6 @@ def commandARA():
 
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
-
 
     print("Initalizing Command ARA...")
     controls()
@@ -1062,7 +1068,6 @@ def constControl():
                 if event.key == pygame.K_SPACE:
                     command_ARA.open_camera_stream()
 
-
         # Set the screen background
         screen.fill(BLACK)
 
@@ -1091,5 +1096,5 @@ def constControl():
     # on exit.pp
     pygame.quit()
 
-constControl()
 
+constControl()
