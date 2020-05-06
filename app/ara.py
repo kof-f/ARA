@@ -1,3 +1,12 @@
+""" Affordable Robot Assistant (ARA) - Developed by Kofi Forson
+
+This file contains the ARA class that implements the main functionality of ARA.
+There are getter/setter methods used to control every aspect of the robot from
+its camera to its claw. For more information on ARA, visit the website:
+akizzlebrand.com/ara.
+
+"""
+
 import socket
 import time
 import webbrowser
@@ -6,13 +15,13 @@ import smtplib
 from email.mime.text import MIMEText
 
 
-# please connect to ARA's Wi-Fi before running program - PASSWORD: 12345678
+# please connect to ARA's Wi-Fi before running program - DEFAULT PASSWORD: 12345678
 class ARA:
-    def __init__(self, left_speed=80, right_speed=80):
+    def __init__(self, left_speed=80, right_speed=80, ip="192.168.1.1", port=2001):
         # used to open the socket and send commands (packets) to ARA (Raspberry Pi 3) through its Wi-Fi
         # double check these are correct by using Wireshark to packet sniff when connected to ARA's Wi-Fi
-        self.ip = "192.168.1.1"
-        self.port = 2001
+        self.ip = ip
+        self.port = port
 
         # used to open ARA's camera stream
         self.camera_stream_url = "http://" + self.ip + ":8080/?action=stream"
@@ -98,7 +107,7 @@ class ARA:
 
     def set_claw_rotate_pos(self, claw_rotate_pos):
         # setting boundaries for the claw rotate position
-        # the claw is horizontal at 86 and horizontal at 171
+        # the claw is horizontal at 86 and vertical at 171
         # so there's no need to accept input outside of those boundaries
         if claw_rotate_pos < 86:
             claw_rotate_pos = 86
@@ -333,12 +342,6 @@ class ARA:
 
         print("Opening ARA's camera stream.")
         webbrowser.open(self.camera_stream_url, new=0, autoraise=True)
-
-
-# variables used to open socket and send commands
-# MAKE SURE TO CHANGE THE IP ADDRESS TO THE IP OF THE RASPBERRY PI ON ARA
-IP = "192.168.1.1"
-PORT = 2001
 
 
 def armMidMove(pos):
@@ -681,226 +684,6 @@ def testARA():
     print(" -------------------------------------- TEST FINISHED --------------------------------------")
 
 
-def commandARA():
-    '''
-    controls ARA while using a 2-D environment
-    :return: N/A
-    '''
-
-    # Define some colors
-    BLACK = (0, 0, 0)
-    WHITE = (255, 255, 255)
-    GREEN = (0, 255, 0)
-    BLUE = (0, 0, 255)
-    RED = (255, 0, 0)
-
-    # This sets the WIDTH and HEIGHT of each grid location
-    WIDTH = 40
-    HEIGHT = 40
-
-    # This sets the margin between each cell
-    MARGIN = 10
-
-    # creates a 2 dimensional array
-    grid = []
-    for row in range(7):
-        # Add an empty array that will hold each cell
-        # in this row
-        grid.append([])
-        for column in range(7):
-            grid[row].append(0)  # Append a cell
-
-    # sets the initial position of ARA and the object
-    araRow = 6
-    araCol = 3
-    grid[araRow][araCol] = 1
-
-    objRow = 0
-    objCol = 3
-    grid[objRow][objCol] = 2
-
-    # Initialize pygame
-    pygame.init()
-
-    # Set the HEIGHT and WIDTH of the screen
-    WINDOW_SIZE = [400, 400]
-    screen = pygame.display.set_mode(WINDOW_SIZE)
-
-    # Set title of screen
-    pygame.display.set_caption("ARA 2-D Environment")
-
-    # Loop until the user clicks the close button.
-    done = False
-
-    # Used to manage how fast the screen updates
-    clock = pygame.time.Clock()
-
-    print("Initalizing Command ARA...")
-    controls()
-
-    # -------- Main Loop -----------
-
-    while not done:
-
-        for event in pygame.event.get():  # User did something
-            if event.type == pygame.QUIT:
-                # If user clicked close
-                print("Fin.")
-                done = True  # Flag that we are done so we exit this loop
-            elif event.type == pygame.KEYDOWN:
-
-                # move ARA forward
-                if event.key == pygame.K_w:
-                    forward(1)
-
-                    grid[araRow][araCol] = 0
-                    araRow -= 1
-                    grid[araRow][araCol] = 1
-
-                    print("ARA Grid coordinates: ", araRow, araCol)
-
-                # move ARA backward
-                elif event.key == pygame.K_s:
-                    backward(1)
-
-                    grid[araRow][araCol] = 0
-                    araRow += 1
-                    grid[araRow][araCol] = 1
-
-                    print("ARA Grid coordinates: ", araRow, araCol)
-
-                # move ARA left
-                elif event.key == pygame.K_a:
-                    turnLeft(1)
-                    forward(1)
-                    turnRight(1)
-
-                    grid[araRow][araCol] = 0
-                    araCol -= 1
-                    grid[araRow][araCol] = 1
-
-                    print("ARA Grid coordinates: ", araRow, araCol)
-
-                # move ARA right
-                elif event.key == pygame.K_d:
-                    turnRight(1)
-                    forward(1)
-                    turnLeft(1)
-
-                    grid[araRow][araCol] = 0
-                    araCol += 1
-                    grid[araRow][araCol] = 1
-
-                    print("ARA Grid coordinates: ", araRow, araCol)
-
-                # start ARA's camera stream
-                elif event.key == pygame.K_SPACE:
-                    cameraStream()
-
-                # print ARA's controls
-                elif event.key == pygame.K_c:
-                    controls()
-
-                # open ARA's claw
-                elif event.key == pygame.K_q:
-                    clawClench(1)
-
-                # close ARA's claw
-                elif event.key == pygame.K_e:
-                    clawClench(0)
-
-                # rotate ARA's claw to a vertical position
-                elif event.key == pygame.K_z:
-                    clawRotate(0)
-
-                # rotate ARA's claw to a horizontal position
-                elif event.key == pygame.K_x:
-                    clawRotate(1)
-
-                # move arm mid to highest position
-                elif event.key == pygame.K_i:
-                    armMidMove(2)
-
-                # move arm mid to middle position
-                elif event.key == pygame.K_k:
-                    armMidMove(1)
-
-                # move arm mid to lowest position
-                elif event.key == pygame.K_COMMA:
-                    armMidMove(0)
-
-                # move arm base to highest position
-                elif event.key == pygame.K_u:
-                    armBaseMove(2)
-
-                # move arm base to middle position
-                elif event.key == pygame.K_j:
-                    armBaseMove(1)
-
-                # move arm base to lowest position
-                elif event.key == pygame.K_m:
-                    armBaseMove(0)
-
-                # pan camera left
-                elif event.key == pygame.K_l:
-                    cameraPan(2)
-
-                # pan camera mid
-                elif event.key == pygame.K_SEMICOLON:
-                    cameraPan(1)
-
-                # pan camera right
-                elif event.key == pygame.K_QUOTE:
-                    cameraPan(0)
-
-                # tilt camera upwards
-                elif event.key == pygame.K_LEFTBRACKET:
-                    cameraTilt(2)
-
-                # tilt camera mid
-                elif event.key == pygame.K_p:
-                    cameraTilt(1)
-
-                # tilt camera downwards
-                elif event.key == pygame.K_o:
-                    cameraTilt(0)
-
-                # send text message to user
-                elif event.key == pygame.K_ESCAPE:
-                    sms()
-
-                else:
-                    print("Command not recognized. Press the 'c' key to see controls.")
-
-        # Set the screen background
-        screen.fill(BLACK)
-
-        # Draw the grid
-        for row in range(7):
-            for column in range(7):
-                color = WHITE
-                if grid[row][column] == 1:
-                    color = GREEN
-                elif grid[row][column] == 2:
-                    color = BLUE
-                pygame.draw.rect(screen,
-                                 color,
-                                 [(MARGIN + WIDTH) * column + MARGIN,
-                                  (MARGIN + HEIGHT) * row + MARGIN,
-                                  WIDTH,
-                                  HEIGHT])
-
-        # 60 frames per second
-        clock.tick(60)
-
-        # Go ahead and update the screen with what we've drawn.
-        pygame.display.flip()
-
-    # Be IDLE friendly. If you forget this line, the program will 'hang'
-    # on exit.pp
-    pygame.quit()
-
-
 def constControl():
     '''
 
@@ -1097,4 +880,6 @@ def constControl():
     pygame.quit()
 
 
-constControl()
+
+if __name__ == "__main__":
+    constControl()
