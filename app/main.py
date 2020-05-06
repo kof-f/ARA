@@ -4,6 +4,9 @@ This file contains the main ARA file that enables a user to control ARA.
 It makes a call to the ARA class. For more information on ARA, visit the
 website: akizzlebrand.com/ara.
 
+The research and development required to launch ARA was supported by the Department
+of Computer and Information Sciences at Delaware State University.
+
 """
 
 import pygame

@@ -5,6 +5,9 @@ There are getter/setter methods used to control every aspect of the robot from
 its camera to its claw. For more information on ARA, visit the website:
 akizzlebrand.com/ara.
 
+The research and development required to launch ARA was supported by the Department
+of Computer and Information Sciences at Delaware State University.
+
 """
 
 import socket
